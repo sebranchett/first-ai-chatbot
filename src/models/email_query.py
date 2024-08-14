@@ -8,4 +8,3 @@ class EmailQueryInput(BaseModel):
 class EmailQueryOutput(BaseModel):
     input: str
     output: str
-    intermediate_steps: list[str]

@@ -10,7 +10,7 @@ app = FastAPI(
 
 
 @async_retry(max_retries=10, delay=1)
-async def invoke_agent_with_retry(query: str):
+async def invoke_with_retry(query: str):
     """Retry the query if it fails to run.
 
     This can help when there are intermittent connection issues
@@ -25,10 +25,7 @@ async def get_status():
 
 
 @app.post("/email-query")
-async def query_email_agent(query: EmailQueryInput) -> EmailQueryOutput:
-    query_response = await invoke_agent_with_retry(query.text)
-    query_response["intermediate_steps"] = [
-        str(s) for s in query_response["intermediate_steps"]
-    ]
+async def query_email(query: EmailQueryInput) -> EmailQueryOutput:
+    query_response = await invoke_with_retry(query.text)
 
     return query_response
