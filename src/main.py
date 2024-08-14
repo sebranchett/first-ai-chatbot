@@ -9,14 +9,14 @@ app = FastAPI(
 )
 
 
-@async_retry(max_retries=10, delay=1)
+@async_retry(max_retries=5, delay=1)
 async def invoke_with_retry(query: str):
     """Retry the query if it fails to run.
 
     This can help when there are intermittent connection issues
     to external APIs.
     """
-    return await email_chain.ainvoke({"input": query})
+    return await email_chain.ainvoke(query)
 
 
 @app.get("/")
@@ -26,6 +26,6 @@ async def get_status():
 
 @app.post("/email-query")
 async def query_email(query: EmailQueryInput) -> EmailQueryOutput:
-    query_response = await invoke_with_retry(query.text)
+    query_response = await invoke_with_retry(query)
 
     return query_response
