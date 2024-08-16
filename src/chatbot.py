@@ -10,6 +10,12 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_community.vectorstores import Chroma
 from langchain_openai import OpenAIEmbeddings
 from langchain.schema.runnable import RunnablePassthrough
+from langchain.agents import (
+    create_openai_functions_agent,
+    Tool,
+    AgentExecutor,
+)
+from langchain import hub
 
 EMAILS_CHROMA_PATH = "chroma_data/"
 
@@ -61,4 +67,37 @@ email_chain = (
     | email_prompt_template
     | chat_model
     | output_parser
+)
+
+tools = [
+    Tool(
+        name="Emails",
+        func=email_chain.invoke,
+        description="""Useful when you need to answer questions
+        about Erik based on his emails.
+        Pass the entire question as input to the tool. For instance,
+        if the question is "Who is Erik?",
+        the input should be "Who is Erik?"
+        """,
+    ),
+]
+
+email_agent_prompt = hub.pull("hwchase17/openai-functions-agent")
+
+agent_chat_model = ChatOpenAI(
+    model="gpt-3.5-turbo-1106",
+    temperature=0,
+)
+
+email_agent = create_openai_functions_agent(
+    llm=agent_chat_model,
+    prompt=email_agent_prompt,
+    tools=tools,
+)
+
+email_agent_executor = AgentExecutor(
+    agent=email_agent,
+    tools=tools,
+    return_intermediate_steps=True,
+    verbose=True,
 )
