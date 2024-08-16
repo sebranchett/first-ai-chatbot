@@ -4,7 +4,7 @@ from models.email_query import EmailQueryInput, EmailQueryOutput
 from utils.async_utils import async_retry
 
 app = FastAPI(
-    title="Ask Erik Anything Chatbot",
+    title="AllAboutErik Chatbot",
     description="Endpoints for chatbot based on Erik's weekly emails",
 )
 
@@ -16,7 +16,7 @@ async def invoke_with_retry(query: str):
     This can help when there are intermittent connection issues
     to external APIs.
     """
-    return await email_chain.ainvoke(query)
+    return await email_chain.ainvoke(query.text)
 
 
 @app.get("/")
